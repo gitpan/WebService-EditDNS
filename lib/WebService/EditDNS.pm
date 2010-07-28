@@ -13,11 +13,11 @@ WebService::EditDNS - Perl interface to EditDNS API
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 SYNOPSIS
@@ -81,12 +81,12 @@ ommitted in further calls to L<"add_record"> and L<"delete_record">.
 =cut
 
 sub new {
-	my $class = shift;
-	my %args = @_;
-	
-	my $self = {};
-	bless($self, $class);
-	
+    my $class = shift;
+    my %args = @_;
+    
+    my $self = {};
+    bless($self, $class);
+    
     if (!defined $args{'email'}) {
         carp "Required parameter 'email' is not defined";
     }
@@ -95,67 +95,67 @@ sub new {
         carp "Required parameter 'apihash' is not defined";
     }
     
-	$self->{'email'} = $args{'email'};
-	$self->{'apihash'} = $args{'apihash'};
-	$self->{'domain'} = $args{'domain'};
-	
-	$self->{'ua'} = LWP::UserAgent->new;
-	$self->{'ua'}->agent("WebService::EditDNS/$VERSION (Perl)");
-	
-	return $self; 
+    $self->{'email'} = $args{'email'};
+    $self->{'apihash'} = $args{'apihash'};
+    $self->{'domain'} = $args{'domain'};
+    
+    $self->{'ua'} = LWP::UserAgent->new;
+    $self->{'ua'}->agent("WebService::EditDNS/$VERSION (Perl)");
+    
+    return $self; 
 }
 
 # Send a EditDNS API request
 
 sub _api_request {
-	my $self = shift;
-	my %args = (
-		'email'     => $self->{'email'},
-		'apihash'   => $self->{'apihash'},
-		'domain'    => $self->{'domain'},
-		@_
+    my $self = shift;
+    my %args = (
+        'email'     => $self->{'email'},
+        'apihash'   => $self->{'apihash'},
+        'domain'    => $self->{'domain'},
+        @_
     );
-	
-	if (!defined $args{'email'}) {
+    
+    if (!defined $args{'email'}) {
         carp "Required parameter 'email' is not defined";
-	}
-	
-	if (!defined $args{'apihash'}) {
-		carp "Required parameter 'apihash' is not defined";
-	}
-	
-	if (!defined $args{'domain'}) {
-		carp "Required parameter 'domain' is not defined";
-	}
-	
-	my $url = 'https://www.editdns.net/api/api.php';
+    }
+    
+    if (!defined $args{'apihash'}) {
+        carp "Required parameter 'apihash' is not defined";
+    }
+    
+    if (!defined $args{'domain'}) {
+        carp "Required parameter 'domain' is not defined";
+    }
+    
+    my $url = 'https://www.editdns.net/api/api.php';
     my $prefix = '?';
-	   
-	for my $arg (keys %args) {
-		$url .= $prefix . $arg . '=' . uri_escape($args{$arg});
+       
+    for my $arg (keys %args) {
+        $url .= $prefix . $arg . '=' . uri_escape($args{$arg});
         $prefix = '&';
-	}
-	
-	my $request = HTTP::Request->new(GET => $url);
-	
-	# Send the request and get the response
-	my $response = $self->{'ua'}->request($request);
-	
-	# Received a HTTP error code
-	if (!$response->is_success) {
-		carp "Request failed (Server response: \"" .
-		    $response->status_line . "\")";
-		return undef;
-	}
-	
-	# Successful EditDNS API responses start with "200:", if it's missing then
-	# we have an error
-	if ($response->content !~ /^200:/) {
-		(my $error = $response->content) =~ s/\n$//;
-		carp "Operation failed (API error message: \"" .
-		    $error . "\")";
-		return undef;
-	}
+    }
+    
+    my $request = HTTP::Request->new(GET => $url);
+    
+    # Send the request and get the response
+    my $response = $self->{'ua'}->request($request);
+    
+    # Received a HTTP error code
+    if (!$response->is_success) {
+        carp "Request failed (Server response: \"" .
+            $response->status_line . "\")";
+        return undef;
+    }
+    
+    # Successful EditDNS API responses start with "200:", if it's missing then
+    # we have an error
+    if ($response->content !~ /^200:/) {
+        (my $error = $response->content) =~ s/\n$//;
+        carp "Operation failed (API error message: \"" .
+            $error . "\")";
+        return undef;
+    }
 }
 
 =head2 add_domain
@@ -187,20 +187,20 @@ backup/slave domains).
 =cut
 
 sub add_domain {
-	my $self = shift;
-	my %args = @_;
-	
-	# Translate parameter names (EditDNS uses camelCase) 
-	$args{'defaultIP'} = $args{'default_ip'} if defined $args{'default_ip'};
-	$args{'masterNS'} = $args{'master_ns'} if defined $args{'master_ns'};
-	
-	# Make original parameters undefined
-	$args{'default_ip'} = undef;
-	$args{'master_ns'} = undef;
-	
-	$args{'addDomain'} = '1';
-	
-	return $self->_api_request(%args);
+    my $self = shift;
+    my %args = @_;
+    
+    # Translate parameter names (EditDNS uses camelCase) 
+    $args{'defaultIP'} = $args{'default_ip'} if defined $args{'default_ip'};
+    $args{'masterNS'} = $args{'master_ns'} if defined $args{'master_ns'};
+    
+    # Make original parameters undefined
+    $args{'default_ip'} = undef;
+    $args{'master_ns'} = undef;
+    
+    $args{'addDomain'} = '1';
+    
+    return $self->_api_request(%args);
 }
 
 =head2 delete_domain
@@ -222,12 +222,12 @@ B<(Required)> Domain name.
 =cut
 
 sub delete_domain {
-	my $self = shift;
-	my %args = @_;
-	
-	$args{'deleteDomain'} = '1';
-	
-	return $self->_api_request(%args);
+    my $self = shift;
+    my %args = @_;
+    
+    $args{'deleteDomain'} = '1';
+    
+    return $self->_api_request(%args);
 }
 
 =head2 add_record
